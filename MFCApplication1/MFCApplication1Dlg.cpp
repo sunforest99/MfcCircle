@@ -170,6 +170,9 @@ HCURSOR CMFCApplication1Dlg::OnQueryDragIcon()
 void CMFCApplication1Dlg::OnBnClickedReset()
 {
 	// TODO: Add your control notification handler code here
+	core->ReDraw();
+
+	Invalidate(FALSE);
 }
 
 void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
@@ -177,8 +180,6 @@ void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	if (core->Addpoint(point))
 	{
-		//SetDlgItemText(EOAC_STATIC_CLOAKING, core->GetPositionString());
-
 		Invalidate(FALSE);
 	}
 

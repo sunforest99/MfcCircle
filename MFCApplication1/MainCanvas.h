@@ -15,6 +15,7 @@ public:
 
 	void InitCanvas(CRect& clientRect);
 	void Draw(CDC& dc);
+	void ClearCanvas();
 
 	// 간단한 Get 함수
 	bool Contains(CPoint point) const { return canvasRect.PtInRect(point); }

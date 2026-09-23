@@ -21,6 +21,7 @@ public:
 	void Initialize(CRect& clientRect);
 
 	void Draw(CDC& dc);
+	void ReDraw();
 
 	bool Addpoint(CPoint dialogPoint);
 };

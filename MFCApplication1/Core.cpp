@@ -20,6 +20,12 @@ void Core::Draw(CDC& dc)
 	mainCanvas->Draw(dc);
 }
 
+void Core::ReDraw()
+{
+	clickPoints.clear();
+	mainCanvas->ClearCanvas();
+}
+
 bool Core::Addpoint(CPoint dialogPoint)
 {
 	if (clickPoints.size() >= MAX_CLICK || !mainCanvas->Contains(dialogPoint))

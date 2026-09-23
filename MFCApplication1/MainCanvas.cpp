@@ -54,6 +54,24 @@ void MainCanvas::Draw(CDC& dc)
 	canvas.Draw(dc, canvasRect);
 }
 
+void MainCanvas::ClearCanvas()
+{
+	if (canvas.IsNull())
+	{
+		return;
+	}
+
+	int pitch = canvas.GetPitch();
+	int height = canvas.GetHeight();
+
+	BYTE* pixels = reinterpret_cast<BYTE*>(canvas.GetBits());
+
+	for (int y = 0; y < height; ++y)
+	{
+		memset(pixels + y * pitch, 255, abs(pitch));
+	}
+}
+
 void MainCanvas::DrawPointCircle(CPoint center, int radius)
 {
 	if (canvas.IsNull() || radius <= 0)
@@ -67,7 +85,7 @@ void MainCanvas::DrawPointCircle(CPoint center, int radius)
 	int width = canvas.GetWidth();
 	int height = canvas.GetHeight();
 	int diameter = radius * radius;
-	 
+
 	for (int y = center.y - radius; y <= center.y + radius; ++y)
 	{
 		for (int x = center.x - radius; x <= center.x + radius; ++x)
