@@ -38,4 +38,5 @@ protected:
 public:
 	afx_msg void OnBnClickedReset();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnBnClickedRandombtn();
 };

@@ -72,6 +72,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(Reset, &CMFCApplication1Dlg::OnBnClickedReset)
 	ON_WM_LBUTTONDOWN()
+	ON_BN_CLICKED(RandomBtn, &CMFCApplication1Dlg::OnBnClickedRandombtn)
 END_MESSAGE_MAP()
 
 
@@ -107,6 +108,8 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	SetDlgItemInt(CircleSize, 5);
+	SetDlgItemInt(Thickness, 2);
 	CRect clientRect;
 	GetClientRect(&clientRect);
 	core->Initialize(clientRect);
@@ -171,15 +174,32 @@ void CMFCApplication1Dlg::OnBnClickedReset()
 {
 	// TODO: Add your control notification handler code here
 	core->ReDraw();
+	SetDlgItemText(PositionText, L"");
 
+	Invalidate(FALSE);
+}
+
+void CMFCApplication1Dlg::OnBnClickedRandombtn()
+{
+	// TODO: Add your control notification handler code here
+	core->ReDraw();
+	SetDlgItemText(PositionText, L"");
+	Invalidate(FALSE);
+
+	core->RandomCircle(GetDlgItemInt(CircleSize));
 	Invalidate(FALSE);
 }
 
 void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	if (core->Addpoint(point))
+	if (core->Addpoint(point, GetDlgItemInt(CircleSize)))
 	{
+		SetDlgItemText(PositionText, core->GetCoordinateText());
+
+		int getThick = GetDlgItemInt(Thickness);
+		core->CalculateCircle(getThick == 0 ? 2 : getThick);
+
 		Invalidate(FALSE);
 	}
 

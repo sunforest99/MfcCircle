@@ -2,6 +2,8 @@
 
 #include "pch.h"
 
+class Core;
+
 class MainCanvas
 {
 private:
@@ -21,5 +23,8 @@ public:
 	bool Contains(CPoint point) const { return canvasRect.PtInRect(point); }
 	CPoint ToCanvasPoint(CPoint point) const { return CPoint(point.x - canvasRect.left, point.y - canvasRect.top); }
 	void DrawPointCircle(CPoint center, int radius);
+	void DrawCircleOutline(double centerX, double centerY, double radius, double thickness);
+	int GetWidth() const { return canvas.GetWidth(); }
+	int GetHeight() const { return canvas.GetHeight(); }
 };
 

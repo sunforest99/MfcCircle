@@ -11,7 +11,7 @@ MainCanvas::~MainCanvas()
 
 void MainCanvas::InitCanvas(CRect& clientRect)
 {
-	canvasRect.SetRect(20, 40, clientRect.Width() - 20, clientRect.Height() - 20);
+	canvasRect.SetRect(20, 60, clientRect.Width() - 20, clientRect.Height() - 20);
 
 	if (!canvas.IsNull())
 	{
@@ -99,6 +99,55 @@ void MainCanvas::DrawPointCircle(CPoint center, int radius)
 			int dy = y - center.y;
 
 			if (dx * dx + dy * dy <= diameter)
+			{
+				pixels[y * pitch + x] = 0;
+			}
+		}
+	}
+}
+
+void MainCanvas::DrawCircleOutline(double centerX, double centerY, double radius, double thickness)
+{
+	if (canvas.IsNull() || radius <= 0)
+	{
+		return;
+	}
+
+	BYTE* pixels = reinterpret_cast<BYTE*>(canvas.GetBits());
+
+	int pitch = canvas.GetPitch();
+	int width = canvas.GetWidth();
+	int height = canvas.GetHeight();
+
+	double harf = thickness / 2.f;
+	double inner = radius - harf;
+	double outer = radius + harf;
+
+	int left = static_cast<int>(std::floor(centerX - outer));
+
+	int right = static_cast<int>(std::ceil(centerX + outer));
+
+	int top = static_cast<int>(std::floor(centerY - outer));
+
+	int bottom = static_cast<int>(std::ceil(centerY + outer));
+
+	
+    for (int y = top; y <= bottom; ++y)
+    {
+        for (int x = left; x <= right; ++x)
+        {
+			if (x < 0 || x >= width || y < 0 || y >= height)
+			{
+				continue;
+			}
+
+			double dx = x - centerX;
+			double dy = y - centerY;
+
+			double distanceSquared = dx * dx + dy * dy;
+
+			if (distanceSquared >= inner * inner &&
+				distanceSquared <= outer * outer)
 			{
 				pixels[y * pitch + x] = 0;
 			}
