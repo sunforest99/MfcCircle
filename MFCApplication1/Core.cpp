@@ -93,23 +93,34 @@ bool Core::CalculateCircle(double thickness) const
 	return true;
 }
 
-void Core::RandomCircle(int size)
+void Core::RandomCircle(int size, int thickness)
 {
-	/*CPoint randPoint;
-
-	std::random_device randomDevice;
-
-	std::mt19937 gen(randomDevice);
-
-	std::uniform_int_distribution<long> xDist(1, mainCanvas->GetWidth());
-	std::uniform_int_distribution<long> yDist(1, mainCanvas->GetHeight());
-
-	for (int i = 0; i < 3; ++i)
+	if (clickPoints.size() != MAX_CLICK)
 	{
-		randPoint.x = xDist(gen);
-		randPoint.y = yDist(gen);
-		Addpoint(randPoint, size);
-	}*/
+		return;
+	}
+
+	static std::mt19937 generator(std::random_device{}());
+
+	int pointRadius = size;
+
+	std::uniform_int_distribution<int> xDist(pointRadius, mainCanvas->GetWidth() - pointRadius - 1);
+	std::uniform_int_distribution<int> yDist(pointRadius, mainCanvas->GetHeight() - pointRadius - 1);
+
+	for (CPoint& point : clickPoints)
+	{
+		point.x = xDist(generator);
+		point.y = yDist(generator);
+	}
+
+	mainCanvas->ClearCanvas();
+
+	CalculateCircle(thickness);
+
+	for (const CPoint& point : clickPoints)
+	{
+		mainCanvas->DrawPointCircle(point, pointRadius);
+	}
 }
 
 CString Core::GetCoordinateText() const

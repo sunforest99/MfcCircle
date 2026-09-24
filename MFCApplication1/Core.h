@@ -25,7 +25,7 @@ public:
 	bool Addpoint(CPoint dialogPoint, int size);
 
 	bool CalculateCircle(double thickness) const;
-	void RandomCircle(int size);
+	void RandomCircle(int size, int thickness);
 
 	CString Core::GetCoordinateText() const;
 };

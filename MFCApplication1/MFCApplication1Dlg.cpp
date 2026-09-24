@@ -170,6 +170,7 @@ HCURSOR CMFCApplication1Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+// 초기화 함수
 void CMFCApplication1Dlg::OnBnClickedReset()
 {
 	// TODO: Add your control notification handler code here
@@ -179,14 +180,13 @@ void CMFCApplication1Dlg::OnBnClickedReset()
 	Invalidate(FALSE);
 }
 
+// 랜덤 버튼 함수
 void CMFCApplication1Dlg::OnBnClickedRandombtn()
 {
 	// TODO: Add your control notification handler code here
-	core->ReDraw();
 	SetDlgItemText(PositionText, L"");
-	Invalidate(FALSE);
-
-	core->RandomCircle(GetDlgItemInt(CircleSize));
+	core->RandomCircle(GetDlgItemInt(CircleSize), GetDlgItemInt(Thickness));
+	SetDlgItemText(PositionText, core->GetCoordinateText());
 	Invalidate(FALSE);
 }
 
@@ -198,6 +198,7 @@ void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 		SetDlgItemText(PositionText, core->GetCoordinateText());
 
 		int getThick = GetDlgItemInt(Thickness);
+		
 		core->CalculateCircle(getThick == 0 ? 2 : getThick);
 
 		Invalidate(FALSE);
