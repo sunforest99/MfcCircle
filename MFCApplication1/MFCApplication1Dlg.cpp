@@ -50,6 +50,19 @@ END_MESSAGE_MAP()
 
 
 
+bool CMFCApplication1Dlg::CheckSize()
+{
+	int circle = GetDlgItemInt(CircleSize);
+	int thick = GetDlgItemInt(Thickness);
+
+	if (circle < MINSIZE || circle > MAXSIZE || thick < MINSIZE || thick > MAXSIZE)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 CMFCApplication1Dlg::CMFCApplication1Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MFCAPPLICATION1_DIALOG, pParent), core(std::make_unique<Core>())
 {
@@ -110,6 +123,8 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 	// TODO: Add extra initialization here
 	SetDlgItemInt(CircleSize, 5);
 	SetDlgItemInt(Thickness, 2);
+	SetDlgItemText(PositionText, L"");
+
 	CRect clientRect;
 	GetClientRect(&clientRect);
 	core->Initialize(clientRect);
@@ -176,6 +191,8 @@ void CMFCApplication1Dlg::OnBnClickedReset()
 	// TODO: Add your control notification handler code here
 	core->ReDraw();
 	SetDlgItemText(PositionText, L"");
+	SetDlgItemInt(CircleSize, 5);
+	SetDlgItemInt(Thickness, 2);
 
 	Invalidate(FALSE);
 }
@@ -185,6 +202,12 @@ void CMFCApplication1Dlg::OnBnClickedRandombtn()
 {
 	// TODO: Add your control notification handler code here
 	SetDlgItemText(PositionText, L"");
+	if (!CheckSize())
+	{
+		MessageBox(_T("1~50 사이로 입력하세요."));
+		return;
+	}
+
 	core->RandomCircle(GetDlgItemInt(CircleSize), GetDlgItemInt(Thickness));
 	SetDlgItemText(PositionText, core->GetCoordinateText());
 	Invalidate(FALSE);
@@ -193,6 +216,12 @@ void CMFCApplication1Dlg::OnBnClickedRandombtn()
 void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
+	if (!CheckSize())
+	{
+		MessageBox(_T("1~50 사이로 입력하세요."));
+		return;
+	}
+
 	if (core->Addpoint(point, GetDlgItemInt(CircleSize)))
 	{
 		SetDlgItemText(PositionText, core->GetCoordinateText());

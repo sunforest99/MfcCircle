@@ -5,12 +5,18 @@
 #pragma once
 #include"Core.h"
 
+#define MINSIZE 1
+#define MAXSIZE 50
+
 // CMFCApplication1Dlg dialog
 class CMFCApplication1Dlg : public CDialogEx
 {
 private:
 	std::unique_ptr<Core> core;
 
+private:
+	bool CheckSize();
+	
 // Construction
 public:
 	CMFCApplication1Dlg(CWnd* pParent = nullptr);	// standard constructor
