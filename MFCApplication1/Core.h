@@ -27,6 +27,9 @@ public:
 	bool CalculateCircle(double thickness) const;
 	void RandomCircle(int size, int thickness);
 
+	int FindPoint(CPoint mousePoint, int pointRadius) const;
+	void MovePoint(int index, CPoint mousePoint, int pointRadius, int thickness);
+
 	CString Core::GetCoordinateText() const;
 };
 

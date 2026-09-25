@@ -14,6 +14,12 @@ class CMFCApplication1Dlg : public CDialogEx
 private:
 	std::unique_ptr<Core> core;
 
+	bool isDragging = false;
+	int draggingPointIndex = -1;
+
+	int circleSize;
+	int thickness;
+
 private:
 	bool CheckSize();
 	
@@ -45,4 +51,6 @@ public:
 	afx_msg void OnBnClickedReset();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnBnClickedRandombtn();
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };

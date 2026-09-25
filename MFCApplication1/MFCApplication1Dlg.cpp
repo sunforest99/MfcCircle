@@ -12,7 +12,6 @@
 #define new DEBUG_NEW
 #endif
 
-
 // CAboutDlg dialog used for App About
 
 class CAboutDlg : public CDialogEx
@@ -86,6 +85,8 @@ BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
 	ON_BN_CLICKED(Reset, &CMFCApplication1Dlg::OnBnClickedReset)
 	ON_WM_LBUTTONDOWN()
 	ON_BN_CLICKED(RandomBtn, &CMFCApplication1Dlg::OnBnClickedRandombtn)
+	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -210,28 +211,57 @@ void CMFCApplication1Dlg::OnBnClickedRandombtn()
 
 	core->RandomCircle(GetDlgItemInt(CircleSize), GetDlgItemInt(Thickness));
 	SetDlgItemText(PositionText, core->GetCoordinateText());
+
 	Invalidate(FALSE);
 }
 
 void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
+	
+	circleSize = GetDlgItemInt(CircleSize);
+	thickness = GetDlgItemInt(Thickness);
+
 	if (!CheckSize())
 	{
 		MessageBox(_T("1~50 사이로 입력하세요."));
 		return;
 	}
 
-	if (core->Addpoint(point, GetDlgItemInt(CircleSize)))
+	draggingPointIndex = core->FindPoint(point, circleSize);
+	if (draggingPointIndex != -1)
+	{
+		isDragging = true;
+	}
+
+	if (core->Addpoint(point, circleSize))
 	{
 		SetDlgItemText(PositionText, core->GetCoordinateText());
 
-		int getThick = GetDlgItemInt(Thickness);
-		
-		core->CalculateCircle(getThick == 0 ? 2 : getThick);
-
-		Invalidate(FALSE);
+		core->CalculateCircle(thickness == 0 ? 2 : thickness);
 	}
 
+	Invalidate(FALSE);
+
 	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+void CMFCApplication1Dlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	if (isDragging)
+	{
+		core->MovePoint(draggingPointIndex, point, circleSize, thickness);
+	}
+	Invalidate(FALSE);
+
+	CDialogEx::OnMouseMove(nFlags, point);
+}
+
+void CMFCApplication1Dlg::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	isDragging = false;
+
+	CDialogEx::OnLButtonUp(nFlags, point);
 }

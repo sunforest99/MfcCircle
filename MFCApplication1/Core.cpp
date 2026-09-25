@@ -123,6 +123,44 @@ void Core::RandomCircle(int size, int thickness)
 	}
 }
 
+int Core::FindPoint(CPoint mousePoint, int pointRadius) const
+{
+	if (!mainCanvas->Contains(mousePoint) || clickPoints.size() != MAX_CLICK)
+	{
+		return -1;
+	}
+
+	CPoint canvasPoint = mainCanvas->ToCanvasPoint(mousePoint);
+	
+	for (int i = 0; i < MAX_CLICK; ++i)
+	{
+		int dx = canvasPoint.x - clickPoints[i].x ;
+		int dy = canvasPoint.y - clickPoints[i].y ;
+
+		if (dx * dx + dy * dy <= pointRadius * pointRadius)
+		{
+			return i;
+		}
+	}
+	
+	return -1;
+}
+
+void Core::MovePoint(int index, CPoint mousePoint, int pointRadius, int thickness)
+{
+	clickPoints[index] = mousePoint;
+
+	mainCanvas->ClearCanvas();
+
+	CalculateCircle(thickness);
+
+	for (const CPoint& point : clickPoints)
+	{
+		mainCanvas->DrawPointCircle(point, pointRadius);
+	}
+
+}
+
 CString Core::GetCoordinateText() const
 {
 	CString result;
