@@ -262,6 +262,7 @@ void CMFCApplication1Dlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
 	isDragging = false;
+	draggingPointIndex = -1;
 
 	CDialogEx::OnLButtonUp(nFlags, point);
 }

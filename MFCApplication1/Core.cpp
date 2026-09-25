@@ -148,7 +148,7 @@ int Core::FindPoint(CPoint mousePoint, int pointRadius) const
 
 void Core::MovePoint(int index, CPoint mousePoint, int pointRadius, int thickness)
 {
-	clickPoints[index] = mousePoint;
+	clickPoints[index] = mainCanvas->ToCanvasPoint(mousePoint);
 
 	mainCanvas->ClearCanvas();
 
@@ -158,7 +158,6 @@ void Core::MovePoint(int index, CPoint mousePoint, int pointRadius, int thicknes
 	{
 		mainCanvas->DrawPointCircle(point, pointRadius);
 	}
-
 }
 
 CString Core::GetCoordinateText() const
