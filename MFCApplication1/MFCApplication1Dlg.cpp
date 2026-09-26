@@ -12,6 +12,13 @@
 #define new DEBUG_NEW
 #endif
 
+// 쓰레드 구별 구조체
+struct RandomThreadData
+{
+	HWND hwnd;
+	UINT runId;
+};
+
 // CAboutDlg dialog used for App About
 
 class CAboutDlg : public CDialogEx
@@ -44,10 +51,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
-
 // CMFCApplication1Dlg dialog
-
-
 
 bool CMFCApplication1Dlg::CheckSize()
 {
@@ -60,6 +64,58 @@ bool CMFCApplication1Dlg::CheckSize()
 	}
 
 	return true;
+}
+
+UINT CMFCApplication1Dlg::RandomThread(LPVOID parameter)
+{
+	RandomThreadData* data = static_cast<RandomThreadData*>(parameter);
+	HWND hwnd = data->hwnd;
+	UINT runId = data->runId;
+	delete data;
+
+	for (int i = 0; i < 10; ++i)
+	{
+		Sleep(500);
+
+		if (!::IsWindow(hwnd))
+		{
+			return 0;
+		}
+
+		::PostMessage(hwnd, WM_RANDOM_STEP, runId, 0);
+	}
+
+	::PostMessage(hwnd, WM_RANDOM_FINISH, runId, 0);
+	return 0;
+}
+
+LRESULT CMFCApplication1Dlg::OnRandomStep(WPARAM wParam, LPARAM)
+{
+	UINT messageRunId = static_cast<UINT>(wParam);
+
+	if (!isRandomRunning || messageRunId != randomRunId)
+	{
+		return 0;
+	}
+
+	core->RandomCircle(circleSize, thickness);
+	SetDlgItemText(PositionText, core->GetCoordinateText());
+
+	Invalidate(FALSE);
+
+	return 0;
+}
+
+LRESULT CMFCApplication1Dlg::OnRandomFinish(WPARAM wParam, LPARAM)
+{
+	UINT messageRunId = static_cast<UINT>(wParam);
+
+	if (messageRunId == randomRunId)
+	{
+		isRandomRunning = false;
+	}
+
+	return 0;
 }
 
 CMFCApplication1Dlg::CMFCApplication1Dlg(CWnd* pParent /*=nullptr*/)
@@ -87,6 +143,8 @@ BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
 	ON_BN_CLICKED(RandomBtn, &CMFCApplication1Dlg::OnBnClickedRandombtn)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONUP()
+	ON_MESSAGE(WM_RANDOM_STEP, &CMFCApplication1Dlg::OnRandomStep)
+	ON_MESSAGE(WM_RANDOM_FINISH, &CMFCApplication1Dlg::OnRandomFinish)
 END_MESSAGE_MAP()
 
 
@@ -190,7 +248,18 @@ HCURSOR CMFCApplication1Dlg::OnQueryDragIcon()
 void CMFCApplication1Dlg::OnBnClickedReset()
 {
 	// TODO: Add your control notification handler code here
+	++randomRunId;
+	isRandomRunning = false;
+	isDragging = false;
+	draggingPointIndex = -1;
+
+	if (GetCapture() == this)
+	{
+		ReleaseCapture();
+	}
+
 	core->ReDraw();
+
 	SetDlgItemText(PositionText, L"");
 	SetDlgItemInt(CircleSize, 5);
 	SetDlgItemInt(Thickness, 2);
@@ -202,15 +271,29 @@ void CMFCApplication1Dlg::OnBnClickedReset()
 void CMFCApplication1Dlg::OnBnClickedRandombtn()
 {
 	// TODO: Add your control notification handler code here
-	SetDlgItemText(PositionText, L"");
 	if (!CheckSize())
 	{
 		MessageBox(_T("1~50 사이로 입력하세요."));
 		return;
 	}
+	if (!core->HasThreePoint() || isRandomRunning)
+	{
+		return;
+	}
+	circleSize = GetDlgItemInt(CircleSize);
+	thickness = GetDlgItemInt(Thickness);
 
-	core->RandomCircle(GetDlgItemInt(CircleSize), GetDlgItemInt(Thickness));
-	SetDlgItemText(PositionText, core->GetCoordinateText());
+	++randomRunId;
+	isRandomRunning = true;
+
+	RandomThreadData* data = new RandomThreadData{ GetSafeHwnd(), randomRunId };
+
+	if (AfxBeginThread(RandomThread, data) == nullptr)
+	{
+		delete data;
+		isRandomRunning = false;
+		return;
+	}
 
 	Invalidate(FALSE);
 }
@@ -218,7 +301,7 @@ void CMFCApplication1Dlg::OnBnClickedRandombtn()
 void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	
+
 	circleSize = GetDlgItemInt(CircleSize);
 	thickness = GetDlgItemInt(Thickness);
 
@@ -232,6 +315,7 @@ void CMFCApplication1Dlg::OnLButtonDown(UINT nFlags, CPoint point)
 	if (draggingPointIndex != -1)
 	{
 		isDragging = true;
+		SetCapture();
 	}
 
 	if (core->Addpoint(point, circleSize))
@@ -252,7 +336,10 @@ void CMFCApplication1Dlg::OnMouseMove(UINT nFlags, CPoint point)
 	if (isDragging)
 	{
 		core->MovePoint(draggingPointIndex, point, circleSize, thickness);
+
+		SetDlgItemText(PositionText, core->GetCoordinateText());
 	}
+
 	Invalidate(FALSE);
 
 	CDialogEx::OnMouseMove(nFlags, point);
@@ -261,8 +348,16 @@ void CMFCApplication1Dlg::OnMouseMove(UINT nFlags, CPoint point)
 void CMFCApplication1Dlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	isDragging = false;
-	draggingPointIndex = -1;
+	if (isDragging)
+	{
+		isDragging = false;
+		draggingPointIndex = -1;
+
+		if (GetCapture() == this)
+		{
+			ReleaseCapture();
+		}
+	}
 
 	CDialogEx::OnLButtonUp(nFlags, point);
 }

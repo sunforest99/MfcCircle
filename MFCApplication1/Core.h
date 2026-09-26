@@ -30,6 +30,8 @@ public:
 	int FindPoint(CPoint mousePoint, int pointRadius) const;
 	void MovePoint(int index, CPoint mousePoint, int pointRadius, int thickness);
 
+	bool HasThreePoint() const { return clickPoints.size() == MAX_CLICK; }
+
 	CString Core::GetCoordinateText() const;
 };
 

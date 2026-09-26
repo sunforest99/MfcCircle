@@ -5,6 +5,10 @@
 #pragma once
 #include"Core.h"
 
+#define WM_RANDOM_STEP (WM_APP + 1)
+#define WM_RANDOM_FINISH (WM_APP + 2)
+
+
 #define MINSIZE 1
 #define MAXSIZE 50
 
@@ -20,8 +24,15 @@ private:
 	int circleSize;
 	int thickness;
 
+	bool isRandomRunning = false;
+	UINT randomRunId = 0;
 private:
 	bool CheckSize();
+
+	// Thread
+	static UINT RandomThread(LPVOID parameter);
+	afx_msg LRESULT OnRandomStep(WPARAM, LPARAM);
+	afx_msg LRESULT OnRandomFinish(WPARAM, LPARAM);
 	
 // Construction
 public:

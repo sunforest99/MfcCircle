@@ -148,6 +148,13 @@ int Core::FindPoint(CPoint mousePoint, int pointRadius) const
 
 void Core::MovePoint(int index, CPoint mousePoint, int pointRadius, int thickness)
 {
+	if (index < 0 ||
+		index >= static_cast<int>(clickPoints.size()) ||
+		!mainCanvas->Contains(mousePoint))
+	{
+		return;
+	}
+
 	clickPoints[index] = mainCanvas->ToCanvasPoint(mousePoint);
 
 	mainCanvas->ClearCanvas();
